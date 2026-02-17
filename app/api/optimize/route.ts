@@ -13,8 +13,8 @@ export async function POST(request: NextRequest) {
     console.log("Received prompt for optimization:", prompt);
     
     try {
-        const completion = await openai.chat.completions.create({ 
-            model : "mistralai/mistral-7b-instruct",
+        const stream = await openai.chat.completions.create({ 
+            model : "meta-llama/llama-3.1-8b-instruct",
             messages : [
                 {
                     role: "user",
@@ -26,13 +26,35 @@ export async function POST(request: NextRequest) {
                 }
             ],
             temperature: 0.7,
+            stream: true,
         });
 
-        const result = completion.choices[0].message.content;
-        return NextResponse.json({ optimizedPromptFromAi: result });
+        const encoder = new TextEncoder();
+
+        return new Response(
+            new ReadableStream({
+                async start(controller) {
+                    for await (const chunk of stream) {
+                        const content = chunk.choices[0].delta?.content || "";
+                        controller.enqueue(encoder.encode(content));
+                    }
+                    controller.close();
+                }
+            }),
+            {
+                headers: {
+                    "Content-Type": "text/plain; charset=utf-8",
+                },
+            }
+        );
+        
     } catch(e) {
-        console.error("Error optimizing prompt:", e);
-        return NextResponse.json({ error: "Failed to optimize prompt" }, { status: 500 });
+        console.error("OpenRouter API error:", e);
+        const errorMessage = e instanceof Error ? e.message : "Unknown error";
+        return NextResponse.json(
+            { error: errorMessage },
+            { status: 500 }
+        );
     }
     
 }
