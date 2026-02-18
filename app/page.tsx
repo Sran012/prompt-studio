@@ -73,8 +73,8 @@ async function submit() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-screen bg-gray-900">
-      <div className="">
-         <input value={prompt} onChange={(e)=> {setPrompt(e.target.value)}} className="h-10 w-40 border-black bg-white text-black px-2"/>
+      <div className="flex justify-center items-center">
+         <textarea value={prompt} onChange={(e)=> {setPrompt(e.target.value)}} className="w-60 border-black bg-white text-black p-2"/>
          {loading && (
         <button
           onClick={handleAbort}
