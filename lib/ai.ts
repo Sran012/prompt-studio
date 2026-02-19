@@ -5,20 +5,15 @@ const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
 });
 
-export async function streamOptimizedPrompt(prompt: string) {
+interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+export async function streamChat(messages :ChatMessage[]) {
   return openai.chat.completions.create({
     model: "mistralai/mistral-7b-instruct",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a professional prompt engineer. Rewrite the user's prompt to be clear, structured, and precise. Return only the improved prompt.",
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
+    messages,
     stream: true,
   });
 }
