@@ -1,11 +1,17 @@
 import { NextRequest } from "next/server";
-import { streamOptimizedPrompt } from "../../../lib/ai";
+import { streamChat } from "../../../lib/ai";
 
 export async function POST(req: NextRequest) {
-  const { prompt } = await req.json();
-  console.log("Received prompt for optimization:", prompt);
+  const { messages } = await req.json();
+  console.log("Received messages:", messages);
 
-  const stream = await streamOptimizedPrompt(prompt);
+  const baseSystem = {
+    role: "system",
+    content:
+      "You are a helpful assistant that optimizes user prompts for better results. When given a user prompt, you will rewrite it to be clearer and more effective for AI processing. Always return only the optimized prompt without any explanations or additional text.",
+  };
+
+  const stream = await streamChat([baseSystem, ...messages]);
 
   const encoder = new TextEncoder();
 
