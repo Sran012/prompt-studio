@@ -26,7 +26,11 @@ async function submit() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",},
-        body: JSON.stringify({prompt}),
+        body: JSON.stringify({
+          messages: [
+            {role:"user", content: prompt}
+          ]
+        }),
         signal: controller.signal,
       });
 
